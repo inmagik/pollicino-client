@@ -2,7 +2,6 @@ import * as qwest from "qwest";
 import { default as Uri } from "jsuri";
 
 
-
 class Pollicino {
 
   constructor(baseUrl, appId, clientSecret) {
@@ -13,35 +12,45 @@ class Pollicino {
     
     this.requestOptions = {
       headers : { 'Cache-Control' : ''},
-      dataType : 'json'
+      dataType : 'json',
+      responseType : 'json'
     };
   
   }
 
-
-
+  
   /*
     Makes a post to our url to confirm client.
     should get a token to be used to next requests
   */
-  async init() {
-    console.log("init", self.baseUrl);
+  init() {
     this.token = "123";
     const authEndpoint = this.baseUrl.setPath("api/auth-client/");
-    console.log("111", authEndpoint.toString());
-    let data = await qwest.post(authEndpoint.toString(), {
+    return qwest.post(
+      authEndpoint.toString(),
+      {
         app_id : this.appId,
         client_secret : this.clientSecret
       },
       this.requestOptions
-    );
-    this.token = data.token;
-    this.requestOptions.headers.Authentication = 'Token ' + this.token;
-
+    ).then((data) => {
+      this.token = data.response.token;
+    //this.requestOptions.headers.Authentication = 'Token ' + this.token;
+      this.requestOptions.headers.Authorization = 'Token ' + this.token; 
+      return data;
+    });
   }
 
-  registerDevice() {
-
+  registerDevice(deviceToken, platform, appVersion='') {
+    console.log(3, this.requestOptions.headers)
+    const authEndpoint = this.baseUrl.setPath("api/register-installation/");
+    return qwest.post(authEndpoint.toString(), {
+        app_version : appVersion,
+        device_token : deviceToken,
+        platform : platform
+      },
+      this.requestOptions
+    );
 
   }
 

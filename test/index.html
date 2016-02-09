@@ -8,7 +8,11 @@
     <script src="../dist/pollicino.js"></script>
     <script>
         var p = new pollicino.Pollicino("http://localhost:8000", "aafc2f105cb442619e20609eb497e372", "a3b00cb805274aea8cc45318638be9dc");
-        p.init();
+        p.init()
+        .then(function(){
+            p.registerDevice("somedevicetoken", 'IOS');    
+        })
+        
 
     </script>
     
